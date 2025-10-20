@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# VARIABLES
+BOX_IMAGE = "debian/bookworm64"
+PROVIDER = "virtualbox"
+NOM_MAQUINA_VIRTUAL = "pj9f4a7.1_enjaba"
+NUM_CPUS = 2
+MEMORIA_RAM = 4096
+HOSTNAME = "pj9f4a7.1-enjaba.fjeclot.net"
+CARPETA_MAQ_FIS = "../codis"
+CARPETA_MAQ_VIR = "/home/vagrant/codis"
+PORT_VIR1 = 80
+PORT_FIS1 = 8000
+PORT_VIR2 = 443
+PORT_FIS2 = 8443
+PROT = "tcp"
+
+# CONFIGURACIÓ DE LA MÀQUINA
+Vagrant.configure("2") do |config|
+  # BOX
+  config.vm.box = BOX_IMAGE
+
+  # CONFIGURACIÓ ESPECÍFICA DEL PROVIDER
+  config.vm.provider PROVIDER do |provider|
+    provider.name = NOM_MAQUINA_VIRTUAL
+    provider.memory = MEMORIA_RAM
+    provider.cpus = NUM_CPUS
+    provider.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+  end
+
+  # CONFIGURACIÓ GENERAL
+  config.vm.hostname = HOSTNAME
+  config.vm.synced_folder CARPETA_MAQ_FIS, CARPETA_MAQ_VIR
+  config.vm.network "forwarded_port", guest: PORT_VIR1, host: PORT_FIS1, protocol: PROT
+  config.vm.network "forwarded_port", guest: PORT_VIR2, host: PORT_FIS2, protocol: PROT
+
+  # PROGRAMARI A INSTAL·LAR I ORDRES A EXECUTAR DURANT LA CREACIÓ DE LA MÀQUINA
+  config.vm.provision "shell", inline: <<-SHELL
+    # 1- Actualització de la llista de programari. Instal·lació del programari general
+    sudo apt-get update
+    sudo apt-get install -y aptitude net-tools whois
+
+    # 2- Ordres d'instal·lació de Docker. Permís a l'usuari vagrant per utilitzar Docker sense sudo
+    sudo apt-get -y install apt-transport-https ca-certificates curl gnupg
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get -y update
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    sudo gpasswd -a vagrant docker
+  SHELL
+end
