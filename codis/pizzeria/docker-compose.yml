@@ -1,0 +1,24 @@
+services:
+ webphp_pizzeria:
+ image: ipizza:1.2
+ build: .
+ container_name: cpizza1.2
+ ports:
+ - "80:80"
+#
+# NOMS DE SERVEIS, IMATGES I CONTENIDORS.
+# 1- webphp_pizzeria → Etiqueta identificadora del servei
+# 2- ipizza:1.0 -> Nom i versió de la imatge que crearem
+# 3- cpizza1.2 -> Nom del contenidor que crearem
+#
+# PORTS EXPOSATS
+# 1- ports:
+# - "80:80" # Ports del contenidor que exposarem a la màquina virtual
+#
+# OBJECTIUS DEL FITXER docker-compose.yml:
+# 1- Posa en marxa el servei webphp_pizzeria necessari per fer anar l'aplicació. Aquest
+# servei utilitza un contenidor. Quan es faci un docker compose up es posarà en marxa
+# aquest servei i els contenidor que necessita.
+# 2- Crea una imatge de contenidor de nom ipizza:1.2
+# 3- Crea un contenidor de nom cpizza1.2 que utilitzant la imatge ipizza:1.2
+# 4- El contenidor exposa el seu port 80 al port 80 de la màquina virtual
