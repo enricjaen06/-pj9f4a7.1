@@ -1,7 +1,7 @@
 services:
-  webphp_pizzeria:
-    image: ipizza:1.2
-    build: .
-    container_name: cpizza1.2
-    ports:
-      - "80:80"
+    webphp_pizzeria:
+        image: ipizza:1.2
+        build: .
+        container_name: cpizza1.2
+        ports:
+            - "80:80"
